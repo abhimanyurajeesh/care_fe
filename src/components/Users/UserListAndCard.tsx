@@ -160,7 +160,12 @@ export const UserStatusIndicator = ({
           cur_online ? "text-green-700" : "text-gray-500",
         )}
       >
-        {cur_online ? t("online") : t("offline")}
+        //{cur_online ? t("online") : t("offline")}
+        {cur_online
+          ? t("online")
+          : user.last_login
+            ? relativeTime(user.last_login)
+            : t("never")}
       </span>
     </div>
   );
