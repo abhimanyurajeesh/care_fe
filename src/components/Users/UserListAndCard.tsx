@@ -136,7 +136,7 @@ export const UserStatusIndicator = ({
 }) => {
   const authUser = useAuthUser();
   const isAuthUser = user.id === authUser.id;
-  const cur_online = isUserOnline(user) || isAuthUser;
+  const isOnline = isUserOnline(user) || isAuthUser;
   const { t } = useTranslation();
 
   return (
