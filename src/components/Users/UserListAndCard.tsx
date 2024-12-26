@@ -134,10 +134,9 @@ export const UserStatusIndicator = ({
   className?: string;
   addPadding?: boolean;
 }) => {
-  const authUser = useAuthUser(); // Get the authenticated user's details
-  const isAuthUser = user.id === authUser.id; // Check if the user is the authenticated user
-  const cur_online = isUserOnline(user) || isAuthUser; // Assume always online if it's the authenticated user
-  
+  const authUser = useAuthUser(); 
+  const isAuthUser = user.id === authUser.id; 
+  const cur_online = isUserOnline(user) || isAuthUser;
   const { t } = useTranslation();
 
   return (
