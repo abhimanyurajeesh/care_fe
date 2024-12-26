@@ -134,8 +134,12 @@ export const UserStatusIndicator = ({
   className?: string;
   addPadding?: boolean;
 }) => {
-  const cur_online = isUserOnline(user);
+  const authUser = useAuthUser(); // Get the authenticated user's details
+  const isAuthUser = user.id === authUser.id; // Check if the user is the authenticated user
+  const cur_online = isUserOnline(user) || isAuthUser; // Assume always online if it's the authenticated user
+  
   const { t } = useTranslation();
+
   return (
     <div
       className={classNames(
@@ -157,11 +161,7 @@ export const UserStatusIndicator = ({
           cur_online ? "text-green-700" : "text-gray-500",
         )}
       >
-        {cur_online
-          ? t("online")
-          : user.last_login
-            ? relativeTime(user.last_login)
-            : t("never")}
+        {cur_online ? t("online") : t("offline")}
       </span>
     </div>
   );
