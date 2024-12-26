@@ -134,8 +134,8 @@ export const UserStatusIndicator = ({
   className?: string;
   addPadding?: boolean;
 }) => {
-  const authUser = useAuthUser(); 
-  const isAuthUser = user.id === authUser.id; 
+  const authUser = useAuthUser();
+  const isAuthUser = user.id === authUser.id;
   const cur_online = isUserOnline(user) || isAuthUser;
   const { t } = useTranslation();
 
@@ -235,7 +235,7 @@ export const UserGrid = ({
 }: {
   users?: UserModel[] | UserAssignedModel[];
 }) => (
-  <div className="grid grid-cols-1 gap-4 @xl:grid-cols-3 @4xl:grid-cols-4 @6xl:grid-cols-5 lg:grid-cols-2"> 
+  <div className="grid grid-cols-1 gap-4 @xl:grid-cols-3 @4xl:grid-cols-4 @6xl:grid-cols-5 lg:grid-cols-2">
     {users?.map((user) => <UserCard key={user.id} user={user} />)}
   </div>
 );
