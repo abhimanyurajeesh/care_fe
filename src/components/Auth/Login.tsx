@@ -170,8 +170,8 @@ const Login = (props: { forgot?: boolean }) => {
 
     //Invalid OTP error handling
     onError: (error: HTTPError) => {
-      let errorMessage = t("invalid_otp");
       Notification.Error({ msg: t("invalid_otp") });
+      let errorMessage = t("invalid_otp");
       if (
         error.cause &&
         Array.isArray(error.cause.errors) &&
