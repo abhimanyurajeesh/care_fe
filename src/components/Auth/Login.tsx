@@ -170,7 +170,6 @@ const Login = (props: { forgot?: boolean }) => {
 
     //Invalid OTP error handling
     onError: (error: HTTPError) => {
-      Notification.Error({ msg: t("invalid_otp") });
       let errorMessage = t("invalid_otp");
       if (
         error.cause &&
@@ -185,6 +184,7 @@ const Login = (props: { forgot?: boolean }) => {
         errorMessage = error.message;
       }
       setOtpValidationError(errorMessage);
+      Notification.Error({ msg: errorMessage });
     },
   });
 
