@@ -83,8 +83,13 @@ export default function ValueSetSelect({
           />
           <CommandList>
             <CommandEmpty>
-              {searchQuery.isFetching ? "Searching..." : noResultsMessage}
+              {search.length < 3
+                ? "Type at least 3 characters to search"
+                : searchQuery.isFetching
+                  ? "Searching..."
+                  : noResultsMessage}
             </CommandEmpty>
+
             <CommandGroup>
               {searchQuery.data?.results.map((option) => (
                 <CommandItem
