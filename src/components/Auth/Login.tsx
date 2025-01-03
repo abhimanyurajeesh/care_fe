@@ -105,13 +105,17 @@ const Login = (props: { forgot?: boolean }) => {
       });
       return response;
     },
-    onSuccess: () => {
-      Notification.Success({
-        msg: t("password_sent"),
-      });
+    onSuccess: (response) => {
+      if (response.res && response.res.ok) {
+        Notification.Success({
+          msg: t("password_sent"),
+        });
+      }
     },
     onError: (error: any) => {
-      setErrors(error);
+      Notification.Error({
+        msg: error.message || t("password_reset_failure"),
+      });
     },
   });
 
