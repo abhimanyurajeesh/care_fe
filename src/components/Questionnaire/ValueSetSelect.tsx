@@ -84,7 +84,7 @@ export default function ValueSetSelect({
           <CommandList>
             <CommandEmpty>
               {search.length < 3
-                ? t("valueSetSelect_typeMinChars")
+                ? t("min_char_length_error", { min_length: 3 })
                 : searchQuery.isFetching
                   ? t("valueSetSelect_searching")
                   : t("valueSetSelect_noResults")}
