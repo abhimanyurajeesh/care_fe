@@ -87,7 +87,7 @@ export default function ValueSetSelect({
                 ? t("valueSetSelect_typeMinChars")
                 : searchQuery.isFetching
                   ? t("valueSetSelect_searching")
-                  : t("valueSetSelect_noResults")}
+                  : t("no_results")}
             </CommandEmpty>
 
             <CommandGroup>
