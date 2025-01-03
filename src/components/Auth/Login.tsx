@@ -4,6 +4,7 @@ import { Link } from "raviger";
 import { useEffect, useState } from "react";
 import ReCaptcha from "react-google-recaptcha";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 
@@ -98,24 +99,10 @@ const Login = (props: { forgot?: boolean }) => {
   });
 
   // Forgot Password Mutation
-  const forgotPasswordMutation = useMutation({
-    mutationFn: async (data: { username: string }) => {
-      const response = await request(routes.forgotPassword, {
-        body: data,
-      });
-      return response;
-    },
-    onSuccess: (response) => {
-      if (response.res && response.res.ok) {
-        Notification.Success({
-          msg: t("password_sent"),
-        });
-      }
-    },
-    onError: (error: any) => {
-      Notification.Error({
-        msg: error.message || t("password_reset_failure"),
-      });
+  const { mutate: submitForgetPassword } = useMutation({
+    mutationFn: mutate(routes.forgotPassword),
+    onSuccess: () => {
+      toast.success(t("password_sent"));
     },
   });
 
@@ -296,7 +283,7 @@ const Login = (props: { forgot?: boolean }) => {
     const valid = validateForgetData();
     if (!valid) return;
 
-    forgotPasswordMutation.mutate(valid);
+    submitForgetPassword(valid);
   };
 
   const onCaptchaChange = (value: any) => {
@@ -326,10 +313,7 @@ const Login = (props: { forgot?: boolean }) => {
 
   // Loading state derived from mutations
   const isLoading =
-    staffLoginMutation.isPending ||
-    forgotPasswordMutation.isPending ||
-    sendOtpPending ||
-    verifyOtpPending;
+    staffLoginMutation.isPending || sendOtpPending || verifyOtpPending;
 
   const logos = [stateLogo, customLogo].filter(
     (logo) => logo?.light || logo?.dark,
