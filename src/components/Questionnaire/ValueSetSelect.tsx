@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 
@@ -29,7 +30,6 @@ interface Props {
   value?: Code | null;
   onSelect: (value: Code) => void;
   placeholder?: string;
-  noResultsMessage?: string;
   disabled?: boolean;
   count?: number;
 }
@@ -39,10 +39,10 @@ export default function ValueSetSelect({
   value,
   onSelect,
   placeholder = "Search...",
-  noResultsMessage = "No results found",
   disabled,
   count = 10,
 }: Props) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useDebouncedState("", 500);
 
@@ -84,10 +84,10 @@ export default function ValueSetSelect({
           <CommandList>
             <CommandEmpty>
               {search.length < 3
-                ? "Type at least 3 characters to search"
+                ? t("valueSetSelect_typeMinChars")
                 : searchQuery.isFetching
-                  ? "Searching..."
-                  : noResultsMessage}
+                  ? t("valueSetSelect_searching")
+                  : t("valueSetSelect_noResults")}
             </CommandEmpty>
 
             <CommandGroup>
