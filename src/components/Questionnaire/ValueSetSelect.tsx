@@ -87,7 +87,7 @@ export default function ValueSetSelect({
                 ? t("min_char_length_error", { min_length: 3 })
                 : searchQuery.isFetching
                   ? t("searching")
-                  : t("no_results")}
+                  : t("no_results_found")}
             </CommandEmpty>
 
             <CommandGroup>
