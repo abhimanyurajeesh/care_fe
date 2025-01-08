@@ -14,7 +14,6 @@ import Loading from "@/components/Common/Loading";
 
 import routes from "@/Utils/request/api";
 import mutate from "@/Utils/request/mutate";
-import { HTTPError } from "@/Utils/request/types";
 import useQuery from "@/Utils/request/useQuery";
 import {
   DetailedValidationError,
@@ -85,7 +84,7 @@ export function QuestionnaireForm({
       toast.success(t("questionnaire_submitted_successfully"));
       onSubmit?.();
     },
-    onError: (error: HTTPError) => {
+    onError: (error) => {
       const errorData = error.cause;
       if (errorData?.results) {
         handleSubmissionError(errorData.results as ValidationErrorResponse[]);
