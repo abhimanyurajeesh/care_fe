@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { t } from "i18next";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import Loading from "@/components/Common/Loading";
 
 import routes from "@/Utils/request/api";
-import useMutation from "@/Utils/request/useMutation";
+import mutate from "@/Utils/request/mutate";
 import useQuery from "@/Utils/request/useQuery";
 import {
   DetailedValidationError,
@@ -77,10 +78,19 @@ export function QuestionnaireForm({
     prefetch: !!questionnaireSlug && !FIXED_QUESTIONNAIRES[questionnaireSlug],
   });
 
-  const { mutate: submitBatch, isProcessing } = useMutation(
-    routes.batchRequest,
-    { silent: true },
-  );
+  const { mutate: submitBatch, isPending: isProcessing } = useMutation({
+    mutationFn: mutate(routes.batchRequest),
+    onSuccess: () => {
+      toast.success("Questionnaire submitted successfully");
+      onSubmit?.();
+    },
+    onError: (error: any) => {
+      if (error.results) {
+        handleSubmissionError(error.results as ValidationErrorResponse[]);
+      }
+      toast.error("Failed to submit questionnaire");
+    },
+  });
 
   useEffect(() => {
     if (!isInitialized && questionnaireSlug) {
@@ -199,9 +209,9 @@ export function QuestionnaireForm({
 
     // Then, add questionnaire submission requests
     questionnaireForms.forEach((form) => {
-      const nonStructuredResponses = form.responses.filter((response) => {
-        return !response.structured_type;
-      });
+      const nonStructuredResponses = form.responses.filter(
+        (response) => !response.structured_type,
+      );
 
       if (nonStructuredResponses.length > 0) {
         requests.push({
@@ -233,22 +243,8 @@ export function QuestionnaireForm({
       }
     });
 
-    const response = await submitBatch({
-      body: { requests },
-    });
-
-    if (!response.data) {
-      if (response.error) {
-        handleSubmissionError(
-          response.error.results as ValidationErrorResponse[],
-        );
-        toast.error("Failed to submit questionnaire");
-      }
-      return;
-    }
-
-    toast.success("Questionnaire submitted successfully");
-    onSubmit?.();
+    // Execute the mutation
+    submitBatch({ requests });
   };
 
   return (
