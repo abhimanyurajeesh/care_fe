@@ -81,14 +81,14 @@ export function QuestionnaireForm({
   const { mutate: submitBatch, isPending: isProcessing } = useMutation({
     mutationFn: mutate(routes.batchRequest),
     onSuccess: () => {
-      toast.success("Questionnaire submitted successfully");
+      toast.success(t("questionnaire_submitted_successfully"));
       onSubmit?.();
     },
     onError: (error: any) => {
       if (error.results) {
         handleSubmissionError(error.results as ValidationErrorResponse[]);
       }
-      toast.error("Failed to submit questionnaire");
+      toast.error(t("questionnaire_error_loading"));
     },
   });
 
