@@ -14,6 +14,7 @@ import Loading from "@/components/Common/Loading";
 
 import routes from "@/Utils/request/api";
 import mutate from "@/Utils/request/mutate";
+import { HTTPError } from "@/Utils/request/types";
 import useQuery from "@/Utils/request/useQuery";
 import {
   DetailedValidationError,
@@ -78,17 +79,18 @@ export function QuestionnaireForm({
     prefetch: !!questionnaireSlug && !FIXED_QUESTIONNAIRES[questionnaireSlug],
   });
 
-  const { mutate: submitBatch, isPending: isProcessing } = useMutation({
-    mutationFn: mutate(routes.batchRequest),
+  const { mutate: submitBatch, isPending } = useMutation({
+    mutationFn: mutate(routes.batchRequest, { silent: true }),
     onSuccess: () => {
       toast.success(t("questionnaire_submitted_successfully"));
       onSubmit?.();
     },
-    onError: (error: any) => {
-      if (error.results) {
-        handleSubmissionError(error.results as ValidationErrorResponse[]);
+    onError: (error: HTTPError) => {
+      const errorData = error.cause;
+      if (errorData?.results) {
+        handleSubmissionError(errorData.results as ValidationErrorResponse[]);
       }
-      toast.error(t("questionnaire_error_loading"));
+      toast.error(t("questionnaire_submission_failed"));
     },
   });
 
@@ -243,7 +245,6 @@ export function QuestionnaireForm({
       }
     });
 
-    // Execute the mutation
     submitBatch({ requests });
   };
 
@@ -260,7 +261,7 @@ export function QuestionnaireForm({
                   "bg-gray-100 text-green-600",
               )}
               onClick={() => setActiveQuestionnaireId(form.questionnaire.id)}
-              disabled={isProcessing}
+              disabled={isPending}
             >
               {form.questionnaire.title}
             </button>
@@ -279,7 +280,7 @@ export function QuestionnaireForm({
                       setActiveQuestionnaireId(form.questionnaire.id);
                       setActiveGroupId(group.id);
                     }}
-                    disabled={isProcessing}
+                    disabled={isPending}
                   >
                     {group.text}
                   </button>
@@ -321,7 +322,7 @@ export function QuestionnaireForm({
                       ),
                     );
                   }}
-                  disabled={isProcessing}
+                  disabled={isPending}
                 >
                   <CareIcon icon="l-times-circle" />
                   <span>Remove</span>
@@ -343,7 +344,7 @@ export function QuestionnaireForm({
                   ),
                 );
               }}
-              disabled={isProcessing}
+              disabled={isPending}
               activeGroupId={activeGroupId}
               errors={form.errors}
               patientId={patientId}
@@ -388,7 +389,7 @@ export function QuestionnaireForm({
                 },
               ]);
             }}
-            disabled={isProcessing}
+            disabled={isPending}
           />
         </div>
 
@@ -399,17 +400,17 @@ export function QuestionnaireForm({
               type="button"
               variant="outline"
               onClick={onCancel}
-              disabled={isProcessing}
+              disabled={isPending}
             >
               {t("cancel")}
             </Button>
             <Button
               type="button"
               onClick={handleSubmit}
-              disabled={isProcessing || hasErrors}
+              disabled={isPending || hasErrors}
               className="relative"
             >
-              {isProcessing ? (
+              {isPending ? (
                 <>
                   <span className="opacity-0">{t("submit")}</span>
                   <div className="absolute inset-0 flex items-center justify-center">
