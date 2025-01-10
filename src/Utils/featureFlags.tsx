@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { FacilityModel } from "@/components/Facility/models";
@@ -5,7 +6,7 @@ import { FacilityModel } from "@/components/Facility/models";
 import useAuthUser from "@/hooks/useAuthUser";
 
 import routes from "@/Utils/request/api";
-import useTanStackQueryInstead from "@/Utils/request/useQuery";
+import query from "@/Utils/request/query";
 
 export type FeatureFlag = "SCRIBE_ENABLED"; // "HCX_ENABLED" | "ABDM_ENABLED" |
 
@@ -49,10 +50,6 @@ export const FeatureFlagsProvider = (props: { children: React.ReactNode }) => {
 };
 
 export const useFeatureFlags = (facility?: FacilityModel | string) => {
-  const [facilityObject, setFacilityObject] = useState<
-    FacilityModel | undefined
-  >(typeof facility === "string" ? undefined : facility);
-
   const context = useContext(FeatureFlagsContext);
   if (context === undefined) {
     throw new Error(
@@ -60,22 +57,17 @@ export const useFeatureFlags = (facility?: FacilityModel | string) => {
     );
   }
 
-  const facilityQuery = useTanStackQueryInstead(routes.getPermittedFacility, {
-    pathParams: {
-      id: typeof facility === "string" ? facility : "",
-    },
-    prefetch: false,
-    silent: true,
-    onResponse: (res) => {
-      setFacilityObject(res.data);
-    },
+  const facilityId = typeof facility === "string" ? facility : facility?.id;
+
+  const { data: facilityObject } = useQuery({
+    queryKey: [routes.getPermittedFacility.path, facilityId],
+    queryFn: query(routes.getPermittedFacility, {
+      pathParams: { id: facilityId || "" },
+    }),
+    enabled: !!facilityId,
   });
 
   const facilityFlags = facilityObject?.facility_flags || [];
-
-  useEffect(() => {
-    facilityQuery.refetch();
-  }, [facility]);
 
   return [...context.user_flags, ...facilityFlags];
 };
