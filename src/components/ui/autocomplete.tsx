@@ -1,4 +1,4 @@
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
+import { CaretSortIcon, CheckIcon, Cross2Icon } from "@radix-ui/react-icons";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -43,6 +43,7 @@ interface AutocompleteProps {
   popoverClassName?: string;
   freeInput?: boolean;
   closeOnSelect?: boolean;
+  showClearButton?: boolean;
   "data-cy"?: string;
 
   ref?: React.RefCallback<HTMLButtonElement | null>;
@@ -65,6 +66,7 @@ export default function Autocomplete({
   popoverClassName,
   freeInput = false,
   closeOnSelect = true,
+  showClearButton = true,
   "data-cy": dataCy,
   ref,
   ...props
@@ -73,7 +75,6 @@ export default function Autocomplete({
   const isMobile = useBreakpoints({ default: true, sm: false });
 
   // Maintain an internal state for the input text when freeInput is enabled.
-  // TODO : Find a better way to handle this, maybe as a seperate component
   const [inputValue, setInputValue] = React.useState(value);
 
   // Find a matching option from the options list (for non freeInput or when value matches an option)
@@ -114,6 +115,30 @@ export default function Autocomplete({
         onSearch(newValue);
       }
     }
+  };
+
+  // Handle clearing the selection
+  const handleClear = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Clear the value through onChange
+    onChange("");
+
+    // Clear the input value if in freeInput mode
+    if (freeInput) {
+      setInputValue("");
+    }
+
+    // Clear the search if onSearch is provided
+    if (onSearch) {
+      onSearch("");
+    }
+
+    // Close the popover
+    setOpen(false);
   };
 
   const commandContent = (
@@ -196,7 +221,19 @@ export default function Autocomplete({
                   : selectedOption?.label
                 : placeholder}
             </span>
-            <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
+            {selectedOption && showClearButton ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-3 p-0 hover:bg-transparent opacity-50"
+                onClick={handleClear}
+              >
+                <Cross2Icon className="size-3" />
+                <span className="sr-only">Clear</span>
+              </Button>
+            ) : (
+              <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
+            )}
           </Button>
         </SheetTrigger>
         <SheetContent
@@ -235,7 +272,19 @@ export default function Autocomplete({
           >
             {displayText}
           </span>
-          <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
+          {selectedOption && showClearButton ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-3 p-0 hover:bg-transparent opacity-50"
+              onClick={handleClear}
+            >
+              <Cross2Icon className="size-3" />
+              <span className="sr-only">Clear</span>
+            </Button>
+          ) : (
+            <CaretSortIcon className="ml-2 size-4 shrink-0 opacity-50" />
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent
